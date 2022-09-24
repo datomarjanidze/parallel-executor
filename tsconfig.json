@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ESNext",
+    "noImplicitAny": true,
+    "declaration": true,
+    "outDir": "./dist",
+    "strict": true
+  },
+  "files": ["./src/index.ts", "src/child.ts"]
+}
