@@ -31,13 +31,16 @@ This package will do this job quicker by:
   ```typescript
   [[1, 9], [2, 10], [3, 11], [4], [5], [6], [7], [8]];
   ```
-  Then it will create your device-CPU-core-number child processes, by
+- Then it will create your device-CPU-core-number child processes, by
   forking your callback in a separate file and establishing an IPC
-  communication channel with them. Then one by one it will pass these
-  balanced batches to each forked process and each child process will
-  execute the same callback with its batch. After each child process is
-  done processing, each will return its result. Finally, when all the
-  results will be ready, the main process will gether all the results in chronological order.
+  communication channel with them
+- Then one by one it will pass these balanced batches to each forked
+  process and each child process will execute the same callback with its
+  batch
+- After each child process is done processing, each will return its
+  result
+- Finally, when all the results will be ready, the main process
+  will gether all the results in chronological order
 
 ### Usage example
 
@@ -129,3 +132,5 @@ const options: IOptions = {
         };
       }
       ```
+  - The returned value is the merged results of the child processes.
+    Type `any[]`
