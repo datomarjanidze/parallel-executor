@@ -6,10 +6,10 @@ import { writeFileSync, readFileSync } from "fs";
 import { Callback, IOptions, Data, DataBatches, IParams } from "./types";
 
 class ParallelExecutor {
-  cpus: CpuInfo[] = cpus();
+  readonly cpus: CpuInfo[] = cpus();
   dataBatches!: DataBatches;
-  childProcessWrapper = join(__dirname, "child.js");
-  childProcessesFilePath = join(__dirname, "child_process.js");
+  readonly childProcessWrapperPath = join(__dirname, "child.js");
+  readonly childProcessesFilePath = join(__dirname, "child_process.js");
   forkedProcesses!: ChildProcess[];
   forkedProcessesResults: { [key: string]: any } = {};
 
@@ -34,7 +34,9 @@ class ParallelExecutor {
   }
 
   private createFileForChildProcesses(callback: Callback): void {
-    let childProcessWrapper = readFileSync(this.childProcessWrapper).toString();
+    let childProcessWrapper = readFileSync(
+      this.childProcessWrapperPath
+    ).toString();
     const fileContent = `
       const callback = ${callback.toString()}
     `;
@@ -76,7 +78,7 @@ class ParallelExecutor {
           if (
             Object.keys(this.forkedProcessesResults).length === this.cpus.length
           ) {
-            forkedProcess.kill();
+            this.onExit();
             resolve();
           }
         });
@@ -101,6 +103,12 @@ class ParallelExecutor {
 
       return results;
     }, []);
+  }
+
+  private onExit(): void {
+    this.dataBatches = [];
+    this.forkedProcesses.forEach((forkedProcess) => forkedProcess.kill());
+    this.forkedProcessesResults = {};
   }
 }
 
