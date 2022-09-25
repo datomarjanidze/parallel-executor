@@ -51,10 +51,8 @@ class ParallelExecutor {
             const pid = forkedProcess.pid;
             forkedProcess.on("message", (result) => {
                 this.forkedProcessesResults[pid] = result;
-                if (Object.keys(this.forkedProcessesResults).length === this.cpus.length) {
-                    this.onExit();
+                if (Object.keys(this.forkedProcessesResults).length === this.cpus.length)
                     resolve();
-                }
             });
             forkedProcess.send({
                 data: this.dataBatches[i],
@@ -69,6 +67,7 @@ class ParallelExecutor {
             if (i !== 0 && i % this.cpus.length === 0)
                 ++j;
             results.push(this.forkedProcessesResults[pid][j]);
+            this.onExit();
             return results;
         }, []);
     }

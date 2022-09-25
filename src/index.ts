@@ -77,10 +77,8 @@ class ParallelExecutor {
 
           if (
             Object.keys(this.forkedProcessesResults).length === this.cpus.length
-          ) {
-            this.onExit();
+          )
             resolve();
-          }
         });
 
         forkedProcess.send({
@@ -100,6 +98,7 @@ class ParallelExecutor {
       if (i !== 0 && i % this.cpus.length === 0) ++j;
 
       results.push(this.forkedProcessesResults[pid][j]);
+      this.onExit();
 
       return results;
     }, []);
