@@ -20,6 +20,7 @@ class ParallelExecutor {
       this.forkedProcesses = this.forkProcesses(options);
       await this.executeForkedProcessesTroughIPCChannel(options);
       resolve(this.generateRefinedResults(options));
+      this.onExit();
     });
   }
 
@@ -98,7 +99,6 @@ class ParallelExecutor {
       if (i !== 0 && i % this.cpus.length === 0) ++j;
 
       results.push(this.forkedProcessesResults[pid][j]);
-      this.onExit();
 
       return results;
     }, []);
