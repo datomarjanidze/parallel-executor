@@ -7,7 +7,7 @@ const fs_1 = require("fs");
 class ParallelExecutor {
     cpus = (0, os_1.cpus)();
     dataBatches;
-    childProcessWrapper = (0, path_1.join)(__dirname, "child.js");
+    childProcessWrapperPath = (0, path_1.join)(__dirname, "child.js");
     childProcessesFilePath = (0, path_1.join)(__dirname, "child_process.js");
     forkedProcesses;
     forkedProcessesResults = {};
@@ -27,7 +27,7 @@ class ParallelExecutor {
         }, new Array(this.cpus.length).fill(0).map(() => []));
     }
     createFileForChildProcesses(callback) {
-        let childProcessWrapper = (0, fs_1.readFileSync)(this.childProcessWrapper).toString();
+        let childProcessWrapper = (0, fs_1.readFileSync)(this.childProcessWrapperPath).toString();
         const fileContent = `
       const callback = ${callback.toString()}
     `;
@@ -52,7 +52,7 @@ class ParallelExecutor {
             forkedProcess.on("message", (result) => {
                 this.forkedProcessesResults[pid] = result;
                 if (Object.keys(this.forkedProcessesResults).length === this.cpus.length) {
-                    forkedProcess.kill();
+                    this.onExit();
                     resolve();
                 }
             });
@@ -71,6 +71,11 @@ class ParallelExecutor {
             results.push(this.forkedProcessesResults[pid][j]);
             return results;
         }, []);
+    }
+    onExit() {
+        this.dataBatches = [];
+        this.forkedProcesses.forEach((forkedProcess) => forkedProcess.kill());
+        this.forkedProcessesResults = {};
     }
 }
 module.exports = { ParallelExecutor };
