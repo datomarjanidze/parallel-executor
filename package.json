@@ -1,6 +1,6 @@
 {
   "name": "parallel-executor",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Splits data into balanced batches and executes simultaneously.",
   "main": "dist/index.js",
   "scripts": {

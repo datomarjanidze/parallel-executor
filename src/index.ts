@@ -14,6 +14,8 @@ class ParallelExecutor {
   forkedProcessesResults: { [key: string]: any } = {};
 
   async execute(callback: Callback, options: IOptions): Promise<any> {
+    options.data ||= [];
+    options.params ||= {};
     return new Promise(async (resolve) => {
       this.dataBatches = this.splitDataIntoBatches(options.data);
       this.createFileForChildProcesses(callback);
