@@ -17,6 +17,10 @@ interface IParams {
     [key: string]: any;
     pid: number;
 }
+interface IIPCChildProcessData {
+    data: Data;
+    params: IParams;
+}
 
 declare class ParallelExecutor {
     readonly cpus: CpuInfo[];
@@ -37,4 +41,4 @@ declare class ParallelExecutor {
     private onExit;
 }
 
-export { ParallelExecutor };
+export { Callback, Data, DataBatches, IIPCChildProcessData, IOptions, IParams, ParallelExecutor };

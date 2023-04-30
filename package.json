@@ -1,6 +1,6 @@
 {
   "name": "parallel-executor",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Splits data into balanced batches and executes simultaneously.",
   "main": "dist/parallel-executor.cjs.js",
   "module": "dist/parallel-executor.esm.js",

@@ -4,12 +4,15 @@ var os = require('os');
 var child_process = require('child_process');
 var path = require('path');
 var fs = require('fs');
+var url = require('url');
 
+const __filename$1 = url.fileURLToPath((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (document.currentScript && document.currentScript.src || new URL('parallel-executor.cjs.js', document.baseURI).href)));
+const __dirname$1 = path.dirname(__filename$1);
 class ParallelExecutor {
     cpus = os.cpus();
     dataBatches;
-    childProcessWrapperPath = path.join(__dirname, typeof require === 'undefined' ? 'child.esm.js' : 'child.cjs.js');
-    childProcessesFilePath = path.join(__dirname, 'child_process.js');
+    childProcessWrapperPath = path.join(__dirname$1, typeof require === 'undefined' ? 'child.esm.js' : 'child.cjs.js');
+    childProcessesFilePath = path.join(__dirname$1, 'child_process.js');
     forkedProcesses;
     forkedProcessesResults = {};
     async execute(callback, options) {
