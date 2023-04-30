@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ESNext",
-    "noImplicitAny": true,
-    "declaration": true,
-    "outDir": "./dist",
-    "strict": true
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "target": "ES2022"
   },
-  "files": ["./src/index.ts", "src/child.ts"]
+  "include": ["src/**/*", "rollup.config.ts"]
 }

@@ -1,71 +1,74 @@
-import { CpuInfo, cpus } from "os";
-import { ChildProcess, fork, ForkOptions } from "child_process";
-import { join } from "path";
-import { writeFileSync, readFileSync } from "fs";
+import { CpuInfo, cpus } from 'os'
+import { ChildProcess, fork, ForkOptions } from 'child_process'
+import { join } from 'path'
+import { writeFileSync, readFileSync } from 'fs'
 
-import { Callback, IOptions, Data, DataBatches, IParams } from "./types";
+import { Callback, IOptions, Data, DataBatches } from './types'
 
 class ParallelExecutor {
-  readonly cpus: CpuInfo[] = cpus();
-  dataBatches!: DataBatches;
-  readonly childProcessWrapperPath = join(__dirname, "child.js");
-  readonly childProcessesFilePath = join(__dirname, "child_process.js");
-  forkedProcesses!: ChildProcess[];
-  forkedProcessesResults: { [key: string]: any } = {};
+  readonly cpus: CpuInfo[] = cpus()
+  dataBatches!: DataBatches
+  readonly childProcessWrapperPath = join(
+    __dirname,
+    typeof require === 'undefined' ? 'child.esm.js' : 'child.cjs.js'
+  )
+  readonly childProcessesFilePath = join(__dirname, 'child_process.js')
+  forkedProcesses!: ChildProcess[]
+  forkedProcessesResults: { [key: string]: any } = {}
 
   async execute(callback: Callback, options: IOptions): Promise<any> {
-    options.data ||= [];
-    options.params ||= {};
+    options.data ||= []
+    options.params ||= {}
     return new Promise(async (resolve) => {
-      this.dataBatches = this.splitDataIntoBatches(options.data);
-      this.createFileForChildProcesses(callback);
-      this.forkedProcesses = this.forkProcesses(options);
-      await this.executeForkedProcessesTroughIPCChannel(options);
-      resolve(this.generateRefinedResults(options));
-      this.onExit();
-    });
+      this.dataBatches = this.splitDataIntoBatches(options.data)
+      this.createFileForChildProcesses(callback)
+      this.forkedProcesses = this.forkProcesses(options)
+      await this.executeForkedProcessesTroughIPCChannel(options)
+      resolve(this.generateRefinedResults(options))
+      this.onExit()
+    })
   }
 
   private splitDataIntoBatches(data: Data): DataBatches {
     return data.reduce(
       (dataBatches: DataBatches, dataItem, i) => {
-        dataBatches[i % this.cpus.length].push(dataItem);
-        return dataBatches;
+        dataBatches[i % this.cpus.length].push(dataItem)
+        return dataBatches
       },
       new Array(this.cpus.length).fill(0).map(() => [])
-    );
+    )
   }
 
   private createFileForChildProcesses(callback: Callback): void {
     let childProcessWrapper = readFileSync(
       this.childProcessWrapperPath
-    ).toString();
+    ).toString()
     const fileContent = `
       const callback = ${callback.toString()}
-    `;
+    `
     childProcessWrapper = childProcessWrapper.replace(
-      "/* #callback# */",
+      '/* #callback# */',
       fileContent
-    );
-    writeFileSync(this.childProcessesFilePath, childProcessWrapper);
+    )
+    writeFileSync(this.childProcessesFilePath, childProcessWrapper)
   }
 
   private forkProcesses(options: IOptions): ChildProcess[] {
     return this.cpus.reduce((forkedProcesses: ChildProcess[]) => {
       forkedProcesses.push(
         this.forkProcess(options.childProcess?.maxOldSpaceSize)
-      );
-      return forkedProcesses;
-    }, []);
+      )
+      return forkedProcesses
+    }, [])
   }
 
   private forkProcess(maxOldSpaceSize?: number): ChildProcess {
-    const options: ForkOptions = {};
+    const options: ForkOptions = {}
 
-    if (typeof maxOldSpaceSize === "number")
-      options.execArgv = [`--max-old-space-size=${maxOldSpaceSize}`];
+    if (typeof maxOldSpaceSize === 'number')
+      options.execArgv = [`--max-old-space-size=${maxOldSpaceSize}`]
 
-    return fork(this.childProcessesFilePath, options);
+    return fork(this.childProcessesFilePath, options)
   }
 
   private executeForkedProcessesTroughIPCChannel(
@@ -73,44 +76,44 @@ class ParallelExecutor {
   ): Promise<void> {
     return new Promise((resolve) =>
       this.forkedProcesses.forEach((forkedProcess, i) => {
-        const pid = forkedProcess.pid as number;
+        const pid = forkedProcess.pid as number
 
-        forkedProcess.on("message", (result) => {
-          this.forkedProcessesResults[pid] = result;
+        forkedProcess.on('message', (result) => {
+          this.forkedProcessesResults[pid] = result
 
           if (
             Object.keys(this.forkedProcessesResults).length === this.cpus.length
           )
-            resolve();
-        });
+            resolve()
+        })
 
         forkedProcess.send({
           data: this.dataBatches[i],
-          params: { ...options.params, pid: pid },
-        });
+          params: { ...options.params, pid: pid }
+        })
       })
-    );
+    )
   }
 
   private generateRefinedResults(options: IOptions): any[] {
-    let j = 0;
+    let j = 0
 
     return options.data.reduce((results: any[], value, i) => {
-      const pid = this.forkedProcesses[i % this.cpus.length].pid as number;
+      const pid = this.forkedProcesses[i % this.cpus.length].pid as number
 
-      if (i !== 0 && i % this.cpus.length === 0) ++j;
+      if (i !== 0 && i % this.cpus.length === 0) ++j
 
-      results.push(this.forkedProcessesResults[pid][j]);
+      results.push(this.forkedProcessesResults[pid][j])
 
-      return results;
-    }, []);
+      return results
+    }, [])
   }
 
   private onExit(): void {
-    this.dataBatches = [];
-    this.forkedProcesses.forEach((forkedProcess) => forkedProcess.kill());
-    this.forkedProcessesResults = {};
+    this.dataBatches = []
+    this.forkedProcesses.forEach((forkedProcess) => forkedProcess.kill())
+    this.forkedProcessesResults = {}
   }
 }
 
-module.exports = { ParallelExecutor };
+export { ParallelExecutor }

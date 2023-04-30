@@ -1,23 +1,23 @@
-export type Callback = (data: Data, params: IParams) => any | Promise<any>;
+export type Callback = (data: Data, params: IParams) => any | Promise<any>
 
 export interface IOptions {
-  data: Data;
-  params: { [key: string]: any };
+  data: Data
+  params: { [key: string]: any }
   childProcess?: {
-    maxOldSpaceSize?: number;
-  };
+    maxOldSpaceSize?: number
+  }
 }
 
-export type Data = any[];
+export type Data = any[]
 
-export type DataBatches = Data[];
+export type DataBatches = Data[]
 
 export interface IParams {
-  [key: string]: any;
-  pid: number;
+  [key: string]: any
+  pid: number
 }
 
 export interface IIPCChildProcessData {
-  data: Data;
-  params: IParams;
+  data: Data
+  params: IParams
 }

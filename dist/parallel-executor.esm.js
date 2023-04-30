@@ -1,14 +1,13 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const os_1 = require("os");
-const child_process_1 = require("child_process");
-const path_1 = require("path");
-const fs_1 = require("fs");
+import { cpus } from 'os';
+import { fork } from 'child_process';
+import { join } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
+
 class ParallelExecutor {
-    cpus = (0, os_1.cpus)();
+    cpus = cpus();
     dataBatches;
-    childProcessWrapperPath = (0, path_1.join)(__dirname, "child.js");
-    childProcessesFilePath = (0, path_1.join)(__dirname, "child_process.js");
+    childProcessWrapperPath = join(__dirname, typeof require === 'undefined' ? 'child.esm.js' : 'child.cjs.js');
+    childProcessesFilePath = join(__dirname, 'child_process.js');
     forkedProcesses;
     forkedProcessesResults = {};
     async execute(callback, options) {
@@ -30,12 +29,12 @@ class ParallelExecutor {
         }, new Array(this.cpus.length).fill(0).map(() => []));
     }
     createFileForChildProcesses(callback) {
-        let childProcessWrapper = (0, fs_1.readFileSync)(this.childProcessWrapperPath).toString();
+        let childProcessWrapper = readFileSync(this.childProcessWrapperPath).toString();
         const fileContent = `
       const callback = ${callback.toString()}
     `;
-        childProcessWrapper = childProcessWrapper.replace("/* #callback# */", fileContent);
-        (0, fs_1.writeFileSync)(this.childProcessesFilePath, childProcessWrapper);
+        childProcessWrapper = childProcessWrapper.replace('/* #callback# */', fileContent);
+        writeFileSync(this.childProcessesFilePath, childProcessWrapper);
     }
     forkProcesses(options) {
         return this.cpus.reduce((forkedProcesses) => {
@@ -45,21 +44,21 @@ class ParallelExecutor {
     }
     forkProcess(maxOldSpaceSize) {
         const options = {};
-        if (typeof maxOldSpaceSize === "number")
+        if (typeof maxOldSpaceSize === 'number')
             options.execArgv = [`--max-old-space-size=${maxOldSpaceSize}`];
-        return (0, child_process_1.fork)(this.childProcessesFilePath, options);
+        return fork(this.childProcessesFilePath, options);
     }
     executeForkedProcessesTroughIPCChannel(options) {
         return new Promise((resolve) => this.forkedProcesses.forEach((forkedProcess, i) => {
             const pid = forkedProcess.pid;
-            forkedProcess.on("message", (result) => {
+            forkedProcess.on('message', (result) => {
                 this.forkedProcessesResults[pid] = result;
                 if (Object.keys(this.forkedProcessesResults).length === this.cpus.length)
                     resolve();
             });
             forkedProcess.send({
                 data: this.dataBatches[i],
-                params: { ...options.params, pid: pid },
+                params: { ...options.params, pid: pid }
             });
         }));
     }
@@ -79,4 +78,5 @@ class ParallelExecutor {
         this.forkedProcessesResults = {};
     }
 }
-module.exports = { ParallelExecutor };
+
+export { ParallelExecutor };
