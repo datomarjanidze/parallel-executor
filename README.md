@@ -1,4 +1,4 @@
-## Parallel Executor v1.1.0 Documentation
+## Parallel Executor v1.1.2 Documentation
 
 <p align="center">
   <a href="https://www.npmjs.com/package/parallel-executor" target="_blank"><img src="https://img.shields.io/npm/v/parallel-executor.svg" alt="NPM Version" /></a>
