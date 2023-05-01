@@ -1,3 +1,8 @@
+# 1.1.2
+
+Fix the bug, placeholder comment was stripped down by the TypeScript,
+replace it with `console.log('callback')`.
+
 # 1.1.1 (2023-04-30)
 
 Add missing types

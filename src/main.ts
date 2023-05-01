@@ -51,7 +51,7 @@ class ParallelExecutor {
       const callback = ${callback.toString()}
     `
     childProcessWrapper = childProcessWrapper.replace(
-      '/* #callback# */',
+      "console.log('callback')",
       fileContent
     )
     writeFileSync(this.childProcessesFilePath, childProcessWrapper)
