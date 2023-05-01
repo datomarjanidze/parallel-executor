@@ -1,4 +1,4 @@
-## Parallel Executor v1.1.3 Documentation
+## Parallel Executor v1.1.4 Documentation
 
 <p align="center">
   <a href="https://www.npmjs.com/package/parallel-executor" target="_blank"><img src="https://img.shields.io/npm/v/parallel-executor.svg" alt="NPM Version" /></a>
@@ -62,9 +62,9 @@ npm i parallel-executor
 import { ParallelExecutor } from 'parallel-executor'
 
 // `myTask` will be executed in child process.
-const myTask = async (data: Data, params: IParams): Promise<number[]> => {
-  const result: number[] = []
-  const myRoutine = (_dataItem: number): Promise<number> => {
+const myTask = async (data, params) => {
+  const result = []
+  const myRoutine = (_dataItem) => {
     return new Promise((resolve) =>
       setTimeout(() => resolve(_dataItem + 1), 1e3)
     )
@@ -74,7 +74,7 @@ const myTask = async (data: Data, params: IParams): Promise<number[]> => {
 
   return result
 }
-const options: IOptions = {
+const options = {
   data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
   params: { dirname: __dirname },
   childProcess: {

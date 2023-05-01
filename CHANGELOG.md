@@ -1,3 +1,7 @@
+# 1.1.4
+
+Change the documentation.
+
 # 1.1.2
 
 Fix the bug, placeholder comment was stripped down by the TypeScript,
