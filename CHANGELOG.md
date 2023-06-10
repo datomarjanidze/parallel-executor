@@ -1,3 +1,7 @@
+# 1.2.0 (2023-06-10)
+
+Remove the downloads tag from `README.md`.
+
 # 1.1.4
 
 Change the documentation.
