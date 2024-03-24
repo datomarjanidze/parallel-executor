@@ -5,7 +5,7 @@
   "main": "dist/parallel-executor.cjs.js",
   "module": "dist/parallel-executor.esm.js",
   "types": "dist/parallel-executor.d.ts",
-  "author": "Dato Marjanidze <datomarjanidze10@gmail.com>",
+  "author": "Dato Marjanidze",
   "license": "ISC",
   "homepage": "https://github.com/datomarjanidze/parallel-executor#readme",
   "files": [
